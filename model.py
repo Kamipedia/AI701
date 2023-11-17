@@ -12,6 +12,14 @@ from tqdm import tqdm
 
 
 class Resblock_torch(nn.Module):
+    """
+    Class to define residual block in the future network. 
+    Input:
+        - in_channels: int - number of input channels;
+        - num_res_blocks: int - number of residuals within one block
+    Output: 
+        - x: torch.Tensor - feature map.   
+    """
     def __init__(self, in_channels, num_res_blocks=3):
         super().__init__()
         self.in_channels = in_channels
@@ -32,14 +40,17 @@ class Resblock_torch(nn.Module):
         
     # define forward pass
     def forward(self, input_):
+        # checking that we pass correctly preprocessed data
         assert self.in_channels == input_.shape[1]
 
         x = self.bn(input_)
 
         for conv in self.conv_block:
+            #adding residuals to the output of each block of convolutions
             x = conv(x) + input_
 
         x = self.output(x)
+        # checking that residuals are compatible with input for future concatenation
         assert x.shape == input_.shape
 
         return x
@@ -47,11 +58,26 @@ class Resblock_torch(nn.Module):
 
 
 class UpsampledViT(nn.Module):
+    """
+    Transformer block class.
+    Input:
+        - in_channels: int - number of input channels;
+        - out_channels: int - number of output channels;
+        - img_size: tuple - size of input feature map; 
+        - patch_size: tuple - size of feature extractor window;
+        - hidden_size: int - size of perceptron layer output;
+        - num_heads: int - number of regions we divide input on to extract features;
+        - spatial_dims: int - prediction dimensionality.
+    Output:
+        - x: torch.Tensor - feature map.
+    """
     def __init__(self, in_channels, out_channels, img_size, patch_size, hidden_size, num_heads, spatial_dims):
         super().__init__()
+        # checking the format of arguments
         self.patch_size = ensure_tuple_rep(patch_size, spatial_dims)
         self.img_size = ensure_tuple_rep(img_size, spatial_dims)
         self.hidden_size = hidden_size
+        # calculating size of features
         self.feat_size = tuple(img_d // p_d for img_d, p_d in zip(img_size, self.patch_size))
         self.vit = vit.ViT(in_channels=in_channels, 
                            img_size=img_size, 
@@ -68,19 +94,21 @@ class UpsampledViT(nn.Module):
         self.conv2 = Resblock_torch(out_channels)
         self.bn1 = nn.BatchNorm2d(out_channels)
         self.bn2 = nn.BatchNorm2d(out_channels)
+        # order of axis for feature projection
         self.proj_axes = (0, spatial_dims + 1) + tuple(d + 1 for d in range(spatial_dims))
         self.proj_view_shape = list(self.feat_size) + [self.hidden_size]
 
 
+    # perorming feature projection after transformer into defined shape
     def proj_feat(self, x):
         new_view = [x.size(0)] + self.proj_view_shape
         x = x.view(new_view)
         x = x.permute(self.proj_axes).contiguous()
         return x        
 
-
+    
+    # define forward pass
     def forward(self, x):
-        # resudual unet block
         x, _ = self.vit(x)
         x = self.proj_feat(x)
         x = self.transp1(x)
@@ -95,6 +123,15 @@ class UpsampledViT(nn.Module):
 
 
 class Unet(nn.Module):
+    """
+    Unet network inicialization class.
+    Input:
+        - in_channels: int - number of input channels;
+        - out_channels: int - number of predicted classes;
+        - depth: int - parameter regulates feature maps dimensionality.
+    Output:
+        - x: torch.Tensor - prediction of the model.
+    """
     def __init__(self, in_channels, out_channels, depth=4):
         super().__init__()
         self.in_channels = in_channels
@@ -102,12 +139,13 @@ class Unet(nn.Module):
         self.depth = [2**(i+4) for i in range(depth+1)]
         self.extractors = nn.ModuleList()
         self.deconvs = nn.ModuleList()
-
+        # if number of downsample layers is odd, then we initialize depth//2 + 1 ResBlocks 
+        # if even then number of Res and Transformer blocks are equal
         if len(self.depth)%2 != 0:
             length = len(self.depth)+1
         else:
             length = len(self.depth)
-
+        # initialize downsampling part
         for i, feature in enumerate(self.depth):
             if i < length//2:
                 self.extractors.append(nn.Sequential(
@@ -123,19 +161,19 @@ class Unet(nn.Module):
                 )
 
             in_channels = feature
-
+        # initialize bottleneck of network, block between downsample and upsample blocks
         self.bottleneck = nn.Sequential(
             Resblock_torch(self.depth[-1]),
             Resblock_torch(self.depth[-1])
         )
-
+        # initialize upsample block
         for feature in reversed(self.depth):
             self.deconvs.append(nn.Sequential(
                                     nn.ConvTranspose2d(feature, int(feature//2), (2, 2), stride = 2),
                                     Resblock_torch(int(feature//2)),
                                             )
                                 )
-
+        # initialize final layer of network, producing output
         self.output = nn.Sequential(
             nn.Conv2d(int(self.depth[0]//2), int(self.depth[0]//2), (3, 3), padding=1),
             nn.ReLU(),
@@ -149,11 +187,14 @@ class Unet(nn.Module):
     
     # define forward pass
     def forward(self, input_):
+        # checking that we pass correctly preprocessed data
         assert input_.shape[1] == self.in_channels
 
+        # output downsample blocks storage
         skip_connections = []
         x = input_
 
+        # downsample pass
         for extractor in self.extractors:
             x = extractor(x)
             skip_connections.append(x)
@@ -161,6 +202,7 @@ class Unet(nn.Module):
         x = self.bottleneck(x)
         skip_connections = skip_connections[::-1][1:]
 
+        # upsample pass
         for idx in range(len(self.deconvs)-1):
             x = self.deconvs[idx](x)
             skip_connection = skip_connections[idx]
