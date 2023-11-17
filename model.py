@@ -13,12 +13,21 @@ from tqdm import tqdm
 
 class Resblock_torch(nn.Module):
     """
-    Class to define residual block in the future network. 
-    Input:
-        - in_channels: int - number of input channels;
-        - num_res_blocks: int - number of residuals within one block
-    Output: 
-        - x: torch.Tensor - feature map.   
+    Residual block class for the UNet architecture.
+
+    Parameters:
+        - in_channels (int): Number of input channels.
+        - num_res_blocks (int, optional): Number of residual blocks within the module.
+
+    Attributes:
+        - in_channels (int): Number of input channels.
+        - bn (nn.BatchNorm2d): Batch normalization layer.
+        - conv_block (nn.ModuleList): List of convolutional blocks.
+        - output (nn.BatchNorm2d): Batch normalization layer for the output.
+
+    Methods:
+        - forward(input_): Defines the forward pass through the residual block.
+
     """
     def __init__(self, in_channels, num_res_blocks=3):
         super().__init__()
@@ -59,17 +68,36 @@ class Resblock_torch(nn.Module):
 
 class UpsampledViT(nn.Module):
     """
-    Transformer block class.
-    Input:
-        - in_channels: int - number of input channels;
-        - out_channels: int - number of output channels;
-        - img_size: tuple - size of input feature map; 
-        - patch_size: tuple - size of feature extractor window;
-        - hidden_size: int - size of perceptron layer output;
-        - num_heads: int - number of regions we divide input on to extract features;
-        - spatial_dims: int - prediction dimensionality.
-    Output:
-        - x: torch.Tensor - feature map.
+    Upsampled Vision Transformer block class.
+
+    Parameters:
+        - in_channels (int): Number of input channels.
+        - out_channels (int): Number of output channels.
+        - img_size (tuple): Size of the input feature map.
+        - patch_size (tuple): Size of the feature extractor window.
+        - hidden_size (int): Size of the perceptron layer output.
+        - num_heads (int): Number of regions to divide the input for feature extraction.
+        - spatial_dims (int): Dimensionality of the prediction.
+
+    Attributes:
+        - patch_size (tuple): Size of the feature extractor window.
+        - img_size (tuple): Size of the input feature map.
+        - hidden_size (int): Size of the perceptron layer output.
+        - feat_size (tuple): Size of the features.
+        - vit (nn.Module): Vision Transformer module.
+        - transp1 (nn.ConvTranspose2d): First transposed convolutional layer.
+        - transp2 (nn.ConvTranspose2d): Second transposed convolutional layer.
+        - conv1 (Resblock_torch): Residual block.
+        - conv2 (Resblock_torch): Residual block.
+        - bn1 (nn.BatchNorm2d): Batch normalization layer.
+        - bn2 (nn.BatchNorm2d): Batch normalization layer.
+        - proj_axes (tuple): Order of axes for feature projection.
+        - proj_view_shape (list): List representing the shape of the feature projection view.
+
+    Methods:
+        - proj_feat(x): Performs feature projection after transformer into the defined shape.
+        - forward(x): Defines the forward pass through the UpsampledViT block.
+
     """
     def __init__(self, in_channels, out_channels, img_size, patch_size, hidden_size, num_heads, spatial_dims):
         super().__init__()
@@ -124,13 +152,25 @@ class UpsampledViT(nn.Module):
 
 class Unet(nn.Module):
     """
-    Unet network inicialization class.
-    Input:
-        - in_channels: int - number of input channels;
-        - out_channels: int - number of predicted classes;
-        - depth: int - parameter regulates feature maps dimensionality.
-    Output:
-        - x: torch.Tensor - prediction of the model.
+    UNet network initialization class.
+
+    Parameters:
+        - in_channels (int): Number of input channels.
+        - out_channels (int): Number of predicted classes.
+        - depth (int, optional): Parameter that regulates feature maps' dimensionality.
+
+    Attributes:
+        - in_channels (int): Number of input channels.
+        - out_channels (int): Number of predicted classes.
+        - depth (list): List of depths for each feature map.
+        - extractors (nn.ModuleList): List of extractors for downsampling.
+        - deconvs (nn.ModuleList): List of transposed convolutional layers for upsampling.
+        - bottleneck (nn.Sequential): Bottleneck layer between downsample and upsample blocks.
+        - output (nn.Sequential): Final layer producing the output.
+
+    Methods:
+        - forward(input_): Defines the forward pass through the UNet network.
+
     """
     def __init__(self, in_channels, out_channels, depth=4):
         super().__init__()
