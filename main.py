@@ -20,11 +20,11 @@ from train_loop import *  # Importing training loop from 'train_loop.py'
 
 DEVICE = 'cuda:3'
 TASK = "fvit_unet_softmax_bce_loss"
-LR = 1e-3
+LR = 4e-3
 IMG_SIZE = 512
 EPOCHS = 50
 VAL_EPOCHS = 1
-BATCH_SIZE = 32
+BATCH_SIZE = 16
 TOLERANCE = 5
 TOL_THRESHOLD = 0.01
 
