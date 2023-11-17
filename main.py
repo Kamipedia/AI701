@@ -49,8 +49,6 @@ model = model.to(DEVICE)
 # Define optimizer, loss criterion, and learning rate scheduler
 optimizer = AdamW(model.parameters(), lr=LR)
 criterion = nn.BCELoss()  # Binary Cross-Entropy Loss
-# Alternatively, use the following for multi-class segmentation:
-# criterion = nn.CrossEntropyLoss()
 
 scheduler = CosineAnnealingLR(optimizer, 10, 0, -1, verbose=False)
 
