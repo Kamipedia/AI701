@@ -11,7 +11,6 @@
 - [Usage](#usage)
 - [Dataset Class](#dataset-class)
 - [Training Script](#training-script)
-- [Dependencies](#dependencies)
 
 ## Introduction
 
@@ -84,12 +83,3 @@ The `Unet` class represents the UNet network.
 
 ## Training Script
 
-
-
-## Dependencies
-
-
-
-## License
-
-This project is licensed under the [License Name] - see the [LICENSE.md](LICENSE.md) file for details.
