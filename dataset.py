@@ -4,6 +4,9 @@ from glob import glob
 
 
 class DatasetClass(Dataset):
+    """
+    Dataset operation class
+    """
     def __init__(self, data, target, transforms=None):
         self.data = sorted(list(glob(data)))
         self.target = sorted(list(glob(target)))
@@ -22,9 +25,9 @@ class DatasetClass(Dataset):
             img = cv2.resize(img, (IMG_SIZE, IMG_SIZE), interpolation=cv2.INTER_CUBIC)
             mask = cv2.resize(mask, (IMG_SIZE, IMG_SIZE), interpolation=cv2.INTER_CUBIC)
 
-        mask = mask
         mask = np.stack([1-mask, mask], axis=0, dtype=np.float32)/255
         img = np.expand_dims(img, axis=0).astype(np.float32)/255
+        
         if self.transforms:
             return self.transforms(img)
         
