@@ -2,6 +2,9 @@
 
  A novel CNN-transformer-based architecture Faster-UNETR that combines the efficiency of CNNs and transformers
 
+ ![faster_unetr_diagram](https://github.com/Kamipedia/AI701/assets/91109627/c4ffcf84-d64c-464e-aa48-16520b9fec30)
+
+
 - [Introduction](#introduction)
 - [Residual Block Class](#residual-block-class)
 - [Upsampled Vision Transformer Class](#upsampled-vision-transformer-class)
@@ -85,19 +88,42 @@ The `Unet` class represents the UNet network.
 Custom dataset class for image segmentation.
 
  - **Parameters:**
-    - data (str): Path pattern for input image files.
-    - target (str): Path pattern for target mask files.
-    - transforms (callable, optional): Optional image transformations.
+    - `data` (str): Path pattern for input image files.
+    - `target` (str): Path pattern for target mask files.
+    - `transforms` (callable, optional): Optional image transformations.
 
   - **Attributes:**
-    - data (list): List of file paths for input images.
-    - target (list): List of file paths for target masks.
-    - transforms (callable, optional): Optional image transformations.
+    - `data` (list): List of file paths for input images.
+    - `target` (list): List of file paths for target masks.
+    - `transforms` (callable, optional): Optional image transformations.
 
   - **Methods:**
-    - __len__: Returns the total number of samples in the dataset.
-    - __getitem__: Retrieves and preprocesses the image and mask at the specified index.
+    - `__len__`: Returns the total number of samples in the dataset.
+    - `__getitem__`: Retrieves and preprocesses the image and mask at the specified index.
    
 ## Usage
 
+### `model.py`
 
+Contains model initializator.
+
+### `dataset.py`
+
+Contains dataset class initializator to operate images.
+
+### `train_loop.py`
+
+Contains train and validation loop functions.
+
+### `test.py`
+
+Contains code to test model.
+
+### `main.py`
+
+Initializer of all the classes and starts training model.
+
+
+### Get started
+
+For retraining model from scratch drop the `best_fivt_unet.pth` file and start the `main.py` file. To test current model start the `test.py` file.
