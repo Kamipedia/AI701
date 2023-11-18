@@ -19,7 +19,7 @@ model = Unet(1, 2)
 
 def test_model(model, predictions=5):
   model = model.to(DEVICE)
-  model.load_state_dict(torch.load('fvit_weights.pth'))
+  model.load_state_dict(torch.load('best_fivt_unet.pth'))
   model.eval()
   
   with torch.no_grad():
