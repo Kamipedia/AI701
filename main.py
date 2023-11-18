@@ -19,7 +19,7 @@ from dataset import *     # Importing dataset class from 'dataset.py'
 from train_loop import *  # Importing training loop from 'train_loop.py'
 
 DEVICE = 'cuda:3'
-TASK = "fvit_unet_softmax_bce_loss"
+TASK = "fvit_unet"
 LR = 4e-3
 IMG_SIZE = 512
 EPOCHS = 50
