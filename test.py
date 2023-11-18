@@ -14,8 +14,10 @@ from glob import glob
 from model import *       # Importing model definition from 'model.py'
 from dataset import *     # Importing dataset class from 'dataset.py'
 
+DEVICE='cuda:0'
+model = Unet(1, 2)
 
-def test_model(model, state_dict, device, predictions=5):
+def test_model(model, predictions=5):
   model = model.to(DEVICE)
   model.load_state_dict(torch.load('fvit_weights.pth'))
   model.eval()
@@ -46,3 +48,5 @@ def test_model(model, state_dict, device, predictions=5):
           plt.plot()
           if i == predictions:
               break
+
+test_model(model)
