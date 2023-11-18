@@ -14,7 +14,7 @@ from glob import glob
 from model import *       # Importing model definition from 'model.py'
 from dataset import *     # Importing dataset class from 'dataset.py'
 
-DEVICE='cuda:0'
+DEVICE='cuda:3'
 model = Unet(1, 2)
 
 def test_model(model, predictions=5):
