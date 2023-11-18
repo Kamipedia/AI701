@@ -2,7 +2,8 @@
 
  A novel CNN-transformer-based architecture Faster-UNETR that combines the efficiency of CNNs and transformers
 
- ![faster_unetr_diagram](https://github.com/Kamipedia/AI701/assets/91109627/c4ffcf84-d64c-464e-aa48-16520b9fec30)
+
+![nontransparent_diagram](https://github.com/Kamipedia/AI701/assets/91109627/20962dc5-e9bd-4ccb-9b5c-7231749a5665)
 
 
 - [Introduction](#introduction)
