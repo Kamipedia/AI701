@@ -1,4 +1,4 @@
-# AI701
+# CorASeg: Coronary Artery Segmentation Using Transformers
 
  A novel CNN-transformer-based architecture Faster-UNETR that combines the efficiency of CNNs and transformers
 
