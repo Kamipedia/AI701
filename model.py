@@ -221,8 +221,7 @@ class Unet(nn.Module):
             nn.Conv2d(int(self.depth[0]//2), int(self.depth[0]//2), (3, 3), padding=1),
             nn.ReLU(),
             nn.BatchNorm2d(int(self.depth[0]//2)),
-            nn.Conv2d(int(self.depth[0]//2), self.out_channels, (1, 1), padding=0),
-            nn.Softmax(dim=1)
+            nn.Conv2d(int(self.depth[0]//2), self.out_channels, (1, 1), padding=0)
         )
     
     # define forward pass
