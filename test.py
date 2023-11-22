@@ -42,8 +42,8 @@ def test_model(model, predictions=5):
           ax[2].imshow(y_pred[0, 1], cmap="gray")
           ax[2].set_title("Prediction")
         
-          ax[3].imshow(y_pred[0].argmax(axis=0), cmap="gray")
-          ax[3].set_title("Prediction argmax")
+          ax[3].imshow([y_pred[0]>-0.25]*1, cmap="gray")
+          ax[3].set_title("Prediction")
         
           plt.plot()
           if i == predictions:
