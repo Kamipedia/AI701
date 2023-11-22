@@ -124,6 +124,10 @@ Contains code to test model.
 
 Initializer of all the classes and starts training model.
 
+### Weights
+
+Weights of models avaliable by [link here](https://drive.google.com/drive/folders/1fpMLCK6dJd0foSGYwKWtxligHpbJDeZA)
+
 
 ### Get started
 
